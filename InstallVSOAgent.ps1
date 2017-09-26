@@ -67,7 +67,7 @@ do
 while ($retries -le $retryCount)
 
 # Construct the agent folder under the main (hardcoded) C: drive.
-$agentInstallationPath = Join-Path "C:" $AgentName 
+$agentInstallationPath = Join-Path "V:" $AgentName 
 # Create the directory for this agent.
 New-Item -ItemType Directory -Force -Path $agentInstallationPath 
 
