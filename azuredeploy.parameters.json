@@ -25,6 +25,15 @@
       },
       "existingVnetRGName": {
         "value": "vsts-vnet-rg"
+      },
+      "vstsAccount": {
+        "value": "YourVSTSAccountName"
+      },
+      "personalAccessToken": {
+        "value": "GEN-PASSWORD"
+      },
+      "poolName": {
+        "value": "YourVSTSAgentPoolName"
       }
     }
   }

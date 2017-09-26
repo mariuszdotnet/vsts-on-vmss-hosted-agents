@@ -13,6 +13,22 @@ Param(
 # Set the computer name to be the agentname
 $AgentName = $env:computername
 
+# Mount Data Disk for Build Agent Data
+Write-Verbose "Mounting Data Disk" -verbose
+
+$disks = Get-Disk | Where partitionstyle -eq 'raw' | sort number
+$count = 0
+$label = "Data Disk"
+
+foreach ($disk in $disks) {
+    $driveLetter = "v"
+    $disk | 
+    Initialize-Disk -PartitionStyle MBR -PassThru |
+    New-Partition -UseMaximumSize -DriveLetter $driveLetter |
+    Format-Volume -FileSystem NTFS -NewFileSystemLabel $label -Confirm:$false -Force
+$count++
+}
+
 Write-Verbose "Entering InstallVSOAgent.ps1" -verbose
 
 $currentLocation = Split-Path -parent $MyInvocation.MyCommand.Definition

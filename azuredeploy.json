@@ -53,7 +53,26 @@
           "metadata": {
             "description": "Name of the existing RG the Vnet and Subnet are located-in."
           } 
-      }
+      },
+      "vstsAccount": {
+        "type": "string",
+        "metadata": {
+          "description": "The Visual Studio Team Services account name, that is, the first part of your VSTSAccount.visualstudio.com"
+        }
+      },
+      "personalAccessToken": {
+        "type": "securestring",
+        "metadata": {
+          "description": "The personal access token to connect to VSTS"
+        }
+      },
+      "poolName": {
+        "type": "string",
+        "defaultValue": "Default",
+        "metadata": {
+          "description": "The Visual Studio Team Services build agent pool for this build agent to join. Use 'Default' if you don't have a separate pool."
+        }
+      }   
     },
     "variables": {
         "existingSubnetID":"[resourceId(parameters('existingVnetRGName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('existingVnetName'), parameters('existingSubNetName'))]"
@@ -79,6 +98,14 @@
                 "createOption": "FromImage",
                 "caching": "ReadWrite"
               },
+              "dataDisks": [
+                {
+                "lun": 1,
+                "createOption": "Empty",
+                "caching": "ReadOnly",
+                "diskSizeGB": 100
+                }
+              ],          
               "imageReference": {
                 "publisher": "MicrosoftVisualStudio",
                 "offer": "VisualStudio",
@@ -113,26 +140,25 @@
             },
             "extensionProfile": {    
                 "extensions": [
-                    {
-                        "name": "CustomScript",
-                        "type": "extensions",
-                        "location": "[resourceGroup().location]",
-                        "apiVersion": "2015-06-15",
-                        "properties": {
-                          "publisher": "Microsoft.Compute",
-                          "type": "CustomScriptExtension",
-                          "typeHandlerVersion": "1.8",
-                          "autoUpgradeMinorVersion": true,
-                          "settings": {
-                            "fileUris": [
-                              "https://raw.githubusercontent.com/mariuszdotnet/vsts-hosted-agents/master/installvstsagent.ps1"
-                              ]
-                          },
-                          "protectedSettings": {
-                              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -Command .\\installvstsagent.ps1 -vstsAccount ', parameters('vstsAccount'), ' -personalAccessToken ', parameters('personalAccessToken'), ' -AgentName ', parameters('vmName'), ' -PoolName ', parameters('poolName'))]"
-                          }
-                        }
+                {
+                    "name": "CustomScript",
+                    "type": "extensions",
+                    "location": "[resourceGroup().location]",
+                    "properties": {
+                      "publisher": "Microsoft.Compute",
+                      "type": "CustomScriptExtension",
+                      "typeHandlerVersion": "1.8",
+                      "autoUpgradeMinorVersion": true,
+                      "settings": {
+                        "fileUris": [
+                          "https://raw.githubusercontent.com/mariuszdotnet/vsts-on-vmss-hosted-agents/master/InstallVSOAgent.ps1"
+                          ]
+                      },
+                      "protectedSettings": {
+                          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -Command .\\InstallVSOAgent.ps1 -vstsAccount ', parameters('vstsAccount'), ' -personalAccessToken ', parameters('personalAccessToken'), ' -PoolName ', parameters('poolName'))]"
                       }
+                    }
+                  }
                 ]
             }
           }
